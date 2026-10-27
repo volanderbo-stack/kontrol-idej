@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Контроль ідей</title>
+<meta name="description" content="Проєкти, ідеї та фільтр «Чи дійсно потрібно?» — щоб не розпорошуватись.">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ідеї">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#f2f2f7;--bg2:#f2f2f7;--card:#ffffff;--fill:rgba(118,118,128,.12);--text:#1c1c1e;--muted:#8a8a8e;
+  --sep:rgba(60,60,67,.14);--blur:rgba(242,242,247,.82);
+  --blue:#007aff;--green:#34c759;--orange:#ff9500;--red:#ff3b30;--purple:#af52de;--teal:#30b0c7;--gray:#8e8e93;
+  --accent:var(--blue);--shadow:0 1px 2px rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.05);
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#000000;--bg2:#1c1c1e;--card:#1c1c1e;--fill:rgba(118,118,128,.24);--text:#f2f2f7;--muted:#98989f;
+  --sep:rgba(84,84,88,.6);--blur:rgba(22,22,24,.8);
+  --blue:#0a84ff;--green:#30d158;--orange:#ff9f0a;--red:#ff453a;--purple:#bf5af2;--teal:#40c8e0;--gray:#98989f;
+  --shadow:none;color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-theme="auto"]{
+    --bg:#000000;--bg2:#1c1c1e;--card:#1c1c1e;--fill:rgba(118,118,128,.24);--text:#f2f2f7;--muted:#98989f;
+    --sep:rgba(84,84,88,.6);--blur:rgba(22,22,24,.8);
+    --blue:#0a84ff;--green:#30d158;--orange:#ff9f0a;--red:#ff453a;--purple:#bf5af2;--teal:#40c8e0;--gray:#98989f;
+    --shadow:none;color-scheme:dark;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);min-height:100vh;
+  font:16px/1.42 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  transition:background .3s,color .3s}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--accent)}
+
+/* Шапка */
+.top{position:sticky;top:0;z-index:20;background:var(--blur);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:.5px solid var(--sep);padding:calc(env(safe-area-inset-top) + 8px) 16px 10px}
+.top-inner{max-width:680px;margin:0 auto}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.app-name{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.top h1{font-size:30px;font-weight:700;letter-spacing:-.025em;margin:0;line-height:1.15}
+.search{margin-top:10px;position:relative}
+.search input{width:100%;border:0;border-radius:12px;background:var(--fill);padding:10px 44px 10px 38px;font-size:16px;outline:none;min-height:44px}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:17px;height:17px;fill:none;stroke:var(--muted);stroke-width:2.2;stroke-linecap:round}
+.search input::-webkit-search-cancel-button{display:none}
+.search .clear{position:absolute;right:0;top:0;width:44px;height:44px;border:0;background:none;color:var(--muted);font-size:18px}
+
+main{max-width:680px;margin:0 auto;padding:16px 16px calc(100px + env(safe-area-inset-bottom))}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+main.enter>*{animation:rise .42s cubic-bezier(.2,.8,.2,1) both}
+main.enter>*:nth-child(2){animation-delay:.03s}main.enter>*:nth-child(3){animation-delay:.06s}
+main.enter>*:nth-child(4){animation-delay:.09s}main.enter>*:nth-child(5){animation-delay:.12s}
+main.enter>*:nth-child(6){animation-delay:.15s}main.enter>*:nth-child(n+7){animation-delay:.18s}
+
+/* Картки */
+.card{background:var(--card);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px;transition:transform .2s}
+.card h3{margin:8px 0 4px;font-size:19px;font-weight:650;letter-spacing:-.015em;line-height:1.25}
+.desc{color:var(--muted);margin:0;font-size:15px;white-space:pre-line}
+.card-top{display:flex;align-items:center;gap:8px;min-height:28px}
+.card-top .end{margin-left:auto}
+.small{font-size:13px}
+.muted{color:var(--muted)}
+.sec{font-size:21px;font-weight:700;letter-spacing:-.015em;margin:24px 4px 10px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.sec:first-child{margin-top:4px}
+.sec small{font-size:14px;color:var(--muted);font-weight:500}
+.hint{color:var(--muted);font-size:14px;margin:-4px 4px 12px}
+
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;border:0;white-space:nowrap;line-height:1.3}
+.pill.dot::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+button.pill{position:relative}
+button.pill::after{content:"";position:absolute;inset:-9px -4px}
+.c-blue{color:var(--blue);background:color-mix(in srgb,var(--blue) 14%,transparent)}
+.c-green{color:var(--green);background:color-mix(in srgb,var(--green) 15%,transparent)}
+.c-orange{color:var(--orange);background:color-mix(in srgb,var(--orange) 15%,transparent)}
+.c-red{color:var(--red);background:color-mix(in srgb,var(--red) 14%,transparent)}
+.c-purple{color:var(--purple);background:color-mix(in srgb,var(--purple) 14%,transparent)}
+.c-teal{color:var(--teal);background:color-mix(in srgb,var(--teal) 15%,transparent)}
+.c-gray{color:var(--gray);background:color-mix(in srgb,var(--gray) 16%,transparent)}
+
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{font-size:13px;padding:3px 9px;border-radius:8px;background:var(--fill);color:var(--muted)}
+.tag.proj{color:var(--text)}
+
+.feats{list-style:none;margin:12px 0 0;padding:0;border-top:.5px solid var(--sep)}
+.feats li{display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:.5px solid var(--sep);font-size:15px}
+.feats li.done span{text-decoration:line-through;color:var(--muted)}
+.check{width:24px;height:24px;border-radius:50%;border:2px solid var(--muted);background:none;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;position:relative;transition:.2s}
+.check::after{content:"";position:absolute;inset:-10px}
+.check.on{background:var(--green);border-color:var(--green)}
+.x{margin-left:auto;border:0;background:none;color:var(--muted);font-size:22px;width:44px;height:44px;flex:none}
+.link{display:inline-block;margin-top:10px;font-size:14px;text-decoration:none;word-break:break-all;padding:6px 0}
+
+.icon-btn{width:44px;height:44px;border-radius:50%;border:0;background:transparent;color:var(--accent);display:inline-flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:-8px -10px -8px auto;flex:none}
+.icon-btn:active{background:var(--fill)}
+
+/* Кнопки */
+.btn{border:0;border-radius:12px;padding:10px 16px;min-height:44px;background:var(--fill);color:var(--accent);font-weight:600;font-size:16px;
+  transition:transform .15s,opacity .15s,background .2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center;line-height:1.25}
+.btn:active{transform:scale(.97);opacity:.85}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.danger{color:var(--red)}
+.btn.ghost{background:transparent;color:var(--muted)}
+.btn.sm{font-size:14.5px;padding:8px 13px}
+.btn.block{width:100%}
+.btn.big{min-height:54px;font-size:17px;border-radius:16px}
+.btn:disabled{opacity:.4;pointer-events:none}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.toolbar .wide{grid-column:1/-1}
+
+/* Фільтри-чипи */
+.chips{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 10px;padding:4px 16px 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{position:relative;border:0;border-radius:999px;padding:7px 14px;background:var(--card);box-shadow:var(--shadow);font-size:14.5px;font-weight:500;white-space:nowrap;transition:.2s;color:var(--text)}
+.chip::after{content:"";position:absolute;inset:-4px 0}
+.chip.on{background:var(--text);color:var(--bg)}
+.chip b{font-weight:600;opacity:.55;margin-left:4px}
+.tags .chip{box-shadow:none;background:var(--fill)}
+.tags .chip.on{background:var(--accent);color:#fff}
+.filters-row{display:flex;gap:10px;align-items:center;margin-bottom:12px}
+.filters-row select{flex:1}
+
+/* Плитки */
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}
+.tile{background:var(--card);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow)}
+.tile b{display:block;font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.tile span{font-size:12.5px;color:var(--muted)}
+.tile.warn b{color:var(--orange)}
+
+/* Бал */
+.score{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:54px;height:54px;border-radius:16px;font-weight:700;font-size:21px;line-height:1;margin-left:auto;flex:none}
+.score small{font-size:10.5px;font-weight:600;opacity:.75;margin-top:3px}
+.warn-box{margin-top:12px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--orange) 14%,transparent);font-size:14px}
+.rank{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:14px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+
+/* Оцінювання */
+.q-title{display:flex;gap:10px;font-weight:600;font-size:16px;margin-bottom:12px}
+.q-n{width:24px;height:24px;border-radius:50%;background:var(--fill);color:var(--muted);font-size:13px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.scale button{min-height:46px;border-radius:12px;border:0;background:var(--fill);font-weight:700;font-size:17px;transition:transform .2s cubic-bezier(.3,1.6,.6,1),background .2s,color .2s}
+.scale button.on{background:var(--accent);color:#fff;transform:scale(1.05)}
+.scale-labels{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-top:6px;padding:0 2px}
+.total-card{position:sticky;bottom:calc(76px + env(safe-area-inset-bottom));z-index:5;
+  background:var(--blur);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border:.5px solid var(--sep)}
+.total-card{padding:12px 16px}
+.total-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.total-num{font-size:32px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.total-num small{font-size:16px;color:var(--muted);font-weight:600}
+.progress{height:6px;border-radius:3px;background:var(--fill);overflow:hidden;margin-bottom:10px}
+.progress i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .35s cubic-bezier(.2,.8,.2,1),background .3s}
+
+/* Рядки-списки */
+.rows{margin:0;padding:0;list-style:none}
+.rows li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--sep);min-height:52px}
+.rows li:last-child{border-bottom:0}
+.rows .grow{flex:1;min-width:0}
+.rows .name{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.row-btn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;text-align:left;padding:0;min-height:44px}
+
+details.card>summary{font-weight:650;font-size:17px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:28px}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary::after{content:"›";font-size:22px;color:var(--muted);transition:transform .25s}
+details.card[open]>summary::after{transform:rotate(90deg)}
+
+/* Статистика */
+.bar-row{display:grid;grid-template-columns:minmax(90px,130px) 1fr 30px;align-items:center;gap:10px;padding:7px 0;font-size:15px}
+.bar-row b{text-align:right}
+.bar{height:10px;border-radius:5px;background:var(--fill);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:5px;animation:grow .8s cubic-bezier(.2,.8,.2,1) both;transform-origin:left}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.gap-mark{font-size:12px;font-weight:600;color:var(--orange)}
+
+.empty{text-align:center;color:var(--muted);padding:36px 16px}
+.empty .big{font-size:44px;margin-bottom:8px}
+.empty p{margin:0 0 14px}
+
+.fab{position:fixed;right:max(16px,calc(50% - 324px));bottom:calc(82px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;
+  background:var(--accent);color:#fff;border:0;font-size:32px;font-weight:300;line-height:1;z-index:25;
+  box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 45%,transparent);transition:transform .2s}
+.fab:active{transform:scale(.92)}
+
+/* Нижнє меню */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--blur);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  border-top:.5px solid var(--sep);padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
+.nav-inner{display:flex;max-width:680px;margin:0 auto}
+.nav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  padding:4px 0;color:var(--muted);font-size:10.5px;font-weight:500;min-height:52px;position:relative;transition:color .2s}
+.nav button.on{color:var(--accent)}
+.nav svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(.3,1.6,.6,1)}
+.nav button.on svg{transform:scale(1.1)}
+.nav .badge{position:absolute;top:2px;left:calc(50% + 6px);background:var(--red);color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;padding:0 5px;display:flex;align-items:center;justify-content:center}
+
+/* Шторка */
+.sheet-wrap{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.38);opacity:0;transition:opacity .3s}
+.sheet{position:relative;width:100%;max-width:680px;max-height:92vh;background:var(--bg2);border-radius:22px 22px 0 0;
+  transform:translateY(100%);transition:transform .38s cubic-bezier(.2,.9,.25,1);display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+.sheet-wrap.open .backdrop,.dlg-wrap.open .backdrop{opacity:1}
+.sheet-wrap.open .sheet{transform:none}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--sep);margin:8px auto 0}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding:6px 14px 6px 20px}
+.sheet-head h2{margin:0;font-size:20px;font-weight:700}
+.sheet-head .icon-btn{margin:0;font-size:17px;color:var(--muted);background:var(--fill);width:32px;height:32px}
+.sheet-head .icon-btn::after{content:"";position:absolute;inset:-6px}
+.sheet-head .icon-btn{position:relative}
+.sheet-body{overflow:auto;padding:8px 16px 22px;-webkit-overflow-scrolling:touch}
+
+.dlg-wrap{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px}
+.dlg{position:relative;background:var(--card);border-radius:22px;max-width:400px;width:100%;padding:20px;max-height:86vh;overflow:auto;
+  transform:scale(.9);opacity:0;transition:transform .28s cubic-bezier(.2,1.2,.4,1),opacity .2s;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.dlg-wrap.open .dlg{transform:none;opacity:1}
+.dlg h2{margin:0 0 8px;font-size:19px;font-weight:700;text-align:center}
+.dlg-body{font-size:15px;color:var(--muted);text-align:center}
+.dlg-body p{margin:0 0 12px}
+.dlg-btns{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.dlg .rows li{text-align:left;color:var(--text)}
+
+/* Поля */
+.field{display:block;margin-bottom:16px}
+.field>span{display:block;font-size:13px;color:var(--muted);margin:0 4px 6px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.input{width:100%;border:0;border-radius:12px;background:var(--card);padding:12px 14px;font-size:16px;outline:none;box-shadow:inset 0 0 0 1px var(--sep);min-height:46px;transition:box-shadow .2s}
+.input:focus{box-shadow:inset 0 0 0 2px var(--accent)}
+textarea.input{resize:vertical;min-height:84px;line-height:1.4}
+select.input{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 20px) 50%,calc(100% - 15px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:36px}
+.mono{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.inline{display:flex;gap:8px;margin-top:10px}
+.inline .input{flex:1}
+.seg{display:flex;background:var(--fill);border-radius:12px;padding:3px;gap:2px}
+.seg button{flex:1;border:0;background:none;padding:8px;border-radius:9px;font-weight:600;font-size:15px;min-height:40px;transition:.2s}
+.seg button.on{background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.14)}
+.stack{display:flex;flex-direction:column;gap:10px}
+
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translate(-50%,16px);background:rgba(28,28,30,.94);color:#fff;
+  padding:12px 18px;border-radius:14px;font-size:15px;opacity:0;pointer-events:none;transition:.3s cubic-bezier(.2,.8,.2,1);z-index:80;
+  max-width:calc(100% - 32px);text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (min-width:600px){.top h1{font-size:34px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="top-row">
+      <div>
+        <div class="app-name">Контроль ідей</div>
+        <h1 id="title">Проєкти</h1>
+      </div>
+      <button class="icon-btn" data-act="settings" aria-label="Налаштування" style="margin:0 -10px 0 0">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Пошук по проєктах та ідеях" autocomplete="off" enterkeyhint="search">
+      <button class="clear" data-act="clearSearch" aria-label="Очистити пошук" hidden>✕</button>
+    </div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<nav class="nav" aria-label="Вкладки">
+  <div class="nav-inner">
+    <button data-act="tab" data-id="projects"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>Проєкти</button>
+    <button data-act="tab" data-id="ideas"><svg viewBox="0 0 24 24"><path d="M9.5 18h5M10.5 21h3M12 3a6 6 0 0 0-3.8 10.6c.8.7 1.3 1.6 1.3 2.6V16h5v-.1c0-1 .5-1.9 1.3-2.6A6 6 0 0 0 12 3z"/></svg>Ідеї</button>
+    <button data-act="tab" data-id="filter"><svg viewBox="0 0 24 24"><path d="M4 5h16l-6.2 7.6V19l-3.6 1.8v-8.2z"/></svg>Фільтр<span class="badge" id="filterBadge" hidden></span></button>
+    <button data-act="tab" data-id="plan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg>План</button>
+    <button data-act="tab" data-id="stats"><svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5"/></svg>Статистика</button>
+  </div>
+</nav>
+
+<div class="sheet-wrap" id="sheetWrap" hidden>
+  <div class="backdrop" data-act="closeSheet"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="grab"></div>
+    <div class="sheet-head"><h2 id="sheetTitle"></h2><button class="icon-btn" data-act="closeSheet" aria-label="Закрити">✕</button></div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+</div>
+
+<div class="dlg-wrap" id="dlgWrap" hidden>
+  <div class="backdrop"></div>
+  <div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <h2 id="dlgTitle"></h2>
+    <div class="dlg-body" id="dlgBody"></div>
+    <div class="dlg-btns" id="dlgBtns"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+'use strict';
+
+/* ============ Константи ============ */
+const KEY = 'ideaControl.v1';
+const VERSION = 1;
+const MAX_ACTIVE = 3;
+const PAUSE_DAYS = 30;
+const STATUSES = ['ідея', 'в роботі', 'на паузі', 'готово', 'закрито'];
+const STATUS_COLOR = {'ідея': 'purple', 'в роботі': 'blue', 'на паузі': 'orange', 'готово': 'green', 'закрито': 'gray'};
+const STATUS_ORDER = {'в роботі': 0, 'ідея': 1, 'на паузі': 2, 'готово': 3, 'закрито': 4};
+const BASE_TAGS = ['навчання', 'мова', 'спорт', "здоров'я", 'фінанси', 'продуктивність', 'бізнес', 'контент', 'духовність', 'право'];
+const GENERIC_TAGS = ['навчання', 'продуктивність'];
+const TITLES = {projects: 'Проєкти', ideas: 'Ідеї', filter: 'Фільтр', plan: 'План', stats: 'Статистика'};
+const TYPE_META = {
+  'покращення': {c: 'teal', icon: '🛠'},
+  "об'єднання": {c: 'purple', icon: '🔗'},
+  'нова': {c: 'blue', icon: '✨'}
+};
+const GOALS = [
+  {name: 'Навчання', tags: ['навчання']},
+  {name: 'Французька', tags: ['мова']},
+  {name: 'Трейдинг та інвестиції', tags: ['фінанси']},
+  {name: 'Бізнес', tags: ['бізнес']},
+  {name: 'Спорт', tags: ['спорт']}
+];
+const QUESTIONS = [
+  {k: 'problem', q: 'Вирішує реальну проблему, яка є в мене ЗАРАЗ?', lo: 'ні', hi: 'так, болить'},
+  {k: 'usage', q: 'Буду користуватись щодня або щотижня?', lo: 'рідко', hi: 'щодня'},
+  {k: 'goals', q: 'Допомагає моїм цілям (навчання, французька, трейдинг та інвестиції, бізнес, спорт)?', lo: 'ні', hi: 'прямо'},
+  {k: 'time', q: 'Скільки часу займе?', lo: 'місяць+', hi: 'один вечір'},
+  {k: 'noAlternative', q: 'Готового безкоштовного аналога немає?', lo: 'є хороший', hi: 'немає'}
+];
+
+/* Тематичні «родини» слів — щоб бачити схожі проєкти навіть з різними тегами */
+const FAMILIES = [
+  {name: 'французька', words: ['франц', 'french', 'français', 'permis', 'b1', 'delf']},
+  {name: 'спорт', words: ['фітнес', 'силов', 'ironiq', 'спорт']},
+  {name: 'сон', words: ['sleep', 'сон', 'будильн', 'прокид']},
+  {name: 'виступи й відео', words: ['сценар', 'телесуфл', 'суфлер', 'оратор', 'youtube', 'виступ', 'відео']},
+  {name: 'гроші', words: ['капітал', 'інвест', 'трейд', 'фінанс', 'біржа', 'акці']},
+  {name: 'право', words: ['цк', 'кодекс', 'закон', 'юрид']}
+];
+
+/* Бібліотека функцій для покращень за тегами */
+const FEATURE_LIB = {
+  'навчання': ['Інтервальне повторення слабких місць', 'Серія днів і щоденна ціль', 'Режим іспиту з таймером', 'Офлайн-режим'],
+  'мова': ['Озвучка фраз і перевірка вимови', 'Словник моїх помилок з автоповтором', 'Діалоги-симуляції реальних ситуацій'],
+  'спорт': ['Автоматична прогресія ваг', 'Журнал тренувань з графіком сили', 'Таймер відпочинку між підходами'],
+  "здоров'я": ['Тижневий звіт і тренди', 'Нагадування за розкладом', 'Зв’язок зі сном і активністю'],
+  'фінанси': ['Журнал угод з причиною входу', 'Калькулятор ризику на угоду (1–2%)', 'Графік капіталу і просідання'],
+  'продуктивність': ['Швидке додавання з головного екрана', 'Щотижневий огляд', 'Резервна копія через експорт/імпорт'],
+  'бізнес': ['Собівартість, ціна і маржа', 'Дашборд ключових метрик', 'Чекліст запуску'],
+  'контент': ['Банк ідей для відео з шаблонами', 'Контент-календар', 'Чекліст перед публікацією'],
+  'духовність': ['План читання на рік', 'Щоденна думка + особиста нотатка', 'Нагадування у зручний час'],
+  'право': ['Картки статей з тестами', 'Розбір реальних кейсів', 'Швидкий пошук по статтях']
+};
+
+/* Ідеї для «дірок» — цілей, які майже не покриті проєктами */
+const GAP_LIB = {
+  'Навчання': [{title: 'Єдиний трекер навчання', description: 'Усі курси, книги й теми в одному місці: прогрес, повторення, щотижневий огляд.', tags: ['навчання', 'продуктивність']}],
+  'Французька': [{title: 'Щоденний діалог французькою з ШІ', description: 'Розмовна практика 10 хвилин на день з виправленням помилок.', tags: ['мова', 'навчання']}],
+  'Трейдинг та інвестиції': [
+    {title: 'Щоденник трейдера', description: 'Журнал угод: причина входу, ризик, результат, емоції. Статистика win-rate і повторюваних помилок.', tags: ['фінанси']},
+    {title: 'Тренажер ризик-менеджменту', description: 'Розмір позиції за правилом 1–2% ризику, стоп-лосс і історія рішень.', tags: ['фінанси', 'навчання']}
+  ],
+  'Бізнес': [{title: 'Фінмодель малого бізнесу', description: 'Собівартість, ціна, маржа і точка беззбитковості для будь-якого продукту.', tags: ['бізнес', 'фінанси']}],
+  'Спорт': [{title: 'Харчування під силові', description: 'Білок і калорії під тренувальну ціль — без зайвого.', tags: ['спорт', "здоров'я"]}]
+};
+
+const STOP_STEMS = new Set(['засто', 'проєк', 'розум', 'щоден', 'кожен', 'додат', 'треке', 'облік', 'через', 'після', 'також', 'тільк', 'більш', 'менше',
+  'якого', 'якому', 'своїх', 'мене', 'мого', 'моїх', 'smart', 'with', 'днів', 'один', 'одна', 'одне', 'того', 'щоби', 'буде', 'дуже', 'всіх', 'усіх', 'цього', 'який', 'яка', 'які', 'якої', 'щоб']);
+
+const SEED = [
+  ['Арена • Мета життя', 'Цілі життя, звички й щоденний прогрес', ['продуктивність']],
+  ['AI-сценарист для YouTube', 'Сценарії для YouTube-відео за допомогою ШІ', ['контент', 'бізнес']],
+  ['Біблія на кожен день', 'Щоденне читання і роздуми', ['духовність']],
+  ['Permis-B1 (права)', 'Підготовка до іспиту на права у Франції', ['навчання', 'мова']],
+  ['French Gym', 'Щоденні вправи з французької', ['мова', 'навчання']],
+  ['Тренажер французької B1', 'Підготовка до рівня B1 (DELF)', ['мова', 'навчання']],
+  ['Французька для столяра', 'Професійна французька лексика для столяра', ['мова', 'навчання']],
+  ['Кухар', 'Рецепти і навчання готуванню', ['навчання']],
+  ['Застосунок з права (ЦК)', 'Цивільний кодекс: статті, тести, кейси', ['право', 'навчання']],
+  ['Капітал (інвестування)', 'Облік інвестицій і росту капіталу', ['фінанси']],
+  ['IRONIQ (фітнес)', 'Фітнес-трекер тренувань', ['спорт']],
+  ['Силові тренування', 'Програми силових тренувань', ['спорт']],
+  ['SleepFlow', 'Трекер сну і режиму', ["здоров'я"]],
+  ['Розумний будильник', 'Будильник, що будить у легкій фазі сну', ["здоров'я", 'продуктивність']],
+  ['Розумний калькулятор', 'Калькулятор з поясненням кроків', ['продуктивність']],
+  ['Розумні нотатки', 'Нотатки з тегами і пошуком', ['продуктивність']],
+  ['Розумний телесуфлер', 'Підказки тексту під час запису відео й виступів', ['контент']],
+  ['Розумний предмет «Менеджмент»', 'Курс менеджменту у форматі уроків', ['навчання', 'бізнес']],
+  ['Ораторське мистецтво', 'Тренування виступів і впевненої мови', ['навчання', 'контент']],
+  ['Гучність з навушників', 'Контроль гучності, щоб берегти слух', ["здоров'я"]],
+  ['«Залишитися людиною» + гайди з ШІ', 'Знання про людяність і практичні гайди з ШІ', ['навчання']],
+  ['Petit déjeuner (мережа пекарень)', 'Бізнес-план і облік мережі пекарень', ['бізнес']]
+];
+
+/* ============ Утиліти ============ */
+const $ = s => document.querySelector(s);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const now = () => new Date().toISOString();
+const days = iso => Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 864e5));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const safeUrl = u => /^https?:\/\//i.test(u) ? u : 'https://' + u;
+const uniq = a => [...new Set(a)];
+function plural(n, one, few, many) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
+  return many;
+}
+function verdictOf(total) {
+  if (total >= 20) return {label: 'Робити зараз', c: 'green', state: 'прийнята'};
+  if (total >= 13) return {label: 'Відкласти', c: 'orange', state: 'відкладена'};
+  return {label: 'Відкинути', c: 'red', state: 'архів'};
+}
+
+/* ============ Дані ============ */
+function seedData() {
+  const t = now();
+  return {
+    version: VERSION,
+    projects: SEED.map(([name, description, tags]) => ({id: uid(), name, description, status: 'ідея', tags, link: '', features: [], createdAt: t, statusChangedAt: t})),
+    ideas: [], suggestions: [], dismissed: [],
+    settings: {theme: 'auto', tab: 'projects'}
+  };
+}
+function migrate(d) {
+  if (!d || typeof d !== 'object') return seedData();
+  // v1 — перша версія схеми; тут додаватимуться міграції для наступних версій
+  d.projects = Array.isArray(d.projects) ? d.projects : [];
+  d.ideas = Array.isArray(d.ideas) ? d.ideas : [];
+  d.suggestions = Array.isArray(d.suggestions) ? d.suggestions : [];
+  d.dismissed = Array.isArray(d.dismissed) ? d.dismissed : [];
+  d.settings = Object.assign({theme: 'auto', tab: 'projects'}, d.settings);
+  d.projects.forEach(p => {
+    p.id = p.id || uid();
+    p.name = String(p.name || 'Без назви');
+    p.description = String(p.description || '');
+    p.status = STATUSES.includes(p.status) ? p.status : 'ідея';
+    p.tags = Array.isArray(p.tags) ? p.tags.map(String) : [];
+    p.link = String(p.link || '');
+    p.features = Array.isArray(p.features) ? p.features.filter(f => f && f.text) : [];
+    p.createdAt = p.createdAt || now();
+    p.statusChangedAt = p.statusChangedAt || p.createdAt;
+  });
+  d.ideas.forEach(i => {
+    i.id = i.id || uid();
+    i.title = String(i.title || 'Без назви');
+    i.description = String(i.description || '');
+    i.type = TYPE_META[i.type] ? i.type : 'нова';
+    i.relatedProjectIds = Array.isArray(i.relatedProjectIds) ? i.relatedProjectIds : [];
+    i.tags = Array.isArray(i.tags) ? i.tags : [];
+    i.state = ['нова', 'прийнята', 'відкладена', 'архів', 'взято'].includes(i.state) ? i.state : 'нова';
+    i.createdAt = i.createdAt || now();
+  });
+  d.version = VERSION;
+  return d;
+}
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) return migrate(JSON.parse(raw));
+  } catch (e) { /* пошкоджені дані — стартуємо заново */ }
+  return seedData();
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(db)); }
+  catch (e) { toast('Не вдалося зберегти дані на пристрої'); }
+}
+
+let db = load();
+save();
+const ui = {tab: db.settings.tab || 'projects', q: '', status: 'all', tag: '', evalId: null, draft: {}, draftFor: null, copyText: ''};
+
+const getP = id => db.projects.find(p => p.id === id);
+const getI = id => db.ideas.find(i => i.id === id);
+const activeProjects = () => db.projects.filter(p => p.status === 'в роботі');
+const pausedLong = () => db.projects.filter(p => p.status === 'на паузі' && days(p.statusChangedAt) >= PAUSE_DAYS);
+const pText = p => p.name + ' ' + p.description;
+
+function setStatus(id, st) {
+  const p = getP(id);
+  if (!p || p.status === st) return;
+  p.status = st;
+  p.statusChangedAt = now();
+  save();
+}
+function addFeature(p, text) {
+  if (!p.features.some(f => f.text.toLowerCase() === text.toLowerCase())) p.features.push({text, done: false});
+  save();
+}
+
+/* ============ Аналіз тексту ============ */
+function tokens(text) { return String(text || '').toLowerCase().match(/[\p{L}\p{N}]+/gu) || []; }
+function stems(text) {
+  const s = new Set();
+  for (const w of tokens(text)) {
+    if (w.length < 4) continue;
+    const st = w.slice(0, 5);
+    if (!STOP_STEMS.has(st)) s.add(st);
+  }
+  return s;
+}
+function families(text) {
+  const toks = tokens(text);
+  return new Set(FAMILIES.filter(f => f.words.some(w => toks.some(t => t.startsWith(w)))).map(f => f.name));
+}
+function relation(tags, text, p) {
+  const shared = tags.filter(t => p.tags.includes(t));
+  const spec = shared.filter(t => !GENERIC_TAGS.includes(t));
+  const a = stems(text), b = stems(pText(p));
+  let st = 0; a.forEach(x => { if (b.has(x)) st++; });
+  const fa = families(text), fb = families(pText(p));
+  let fam = 0; fa.forEach(x => { if (fb.has(x)) fam++; });
+  const union = new Set([...tags, ...p.tags]).size;
+  const jac = union ? shared.length / union : 0;
+  return {
+    shared, spec, st, fam,
+    score: fam * 3 + st * 2 + spec.length * 1.5 + shared.length * .5,
+    similar: fam > 0 || st >= 2 || (spec.length > 0 && (st >= 1 || jac >= .5))
+  };
+}
+function findSimilar(tags, text, excludeIds = []) {
+  let best = null;
+  for (const p of db.projects) {
+    if (excludeIds.includes(p.id) || p.status === 'закрито') continue;
+    const r = relation(tags, text, p);
+    if (r.similar && (!best || r.score > best.score)) best = {p, score: r.score};
+  }
+  return best ? best.p : null;
+}
+
+/* ============ Генератор ідей ============ */
+function goalCoverage() {
+  const live = db.projects.filter(p => p.status !== 'закрито');
+  return GOALS.map(g => ({...g, count: live.filter(p => p.tags.some(t => g.tags.includes(t))).length}));
+}
+function mergeClusters(live) {
+  const parent = new Map(live.map(p => [p.id, p.id]));
+  const find = x => { while (parent.get(x) !== x) { parent.set(x, parent.get(parent.get(x))); x = parent.get(x); } return x; };
+  for (let a = 0; a < live.length; a++) {
+    for (let b = a + 1; b < live.length; b++) {
+      const r = relation(live[a].tags, pText(live[a]), live[b]);
+      if (r.fam > 0 || (r.spec.length && r.st > 0) || (r.shared.length >= 2 && r.spec.length)) parent.set(find(live[a].id), find(live[b].id));
+    }
+  }
+  const groups = {};
+  live.forEach(p => { (groups[find(p.id)] ||= []).push(p); });
+  return Object.values(groups).filter(g => g.length >= 2).sort((a, b) => b.length - a.length).map(g => {
+    g = g.slice(0, 4);
+    const famCount = {};
+    g.forEach(p => families(pText(p)).forEach(f => { famCount[f] = (famCount[f] || 0) + 1; }));
+    let reason = Object.keys(famCount).filter(f => famCount[f] >= 2);
+    if (!reason.length) reason = uniq(g.flatMap(p => p.tags)).filter(t => g.filter(p => p.tags.includes(t)).length >= 2 && !GENERIC_TAGS.includes(t));
+    const n = g.length;
+    return {
+      key: 'merge:' + g.map(p => p.id).sort().join('+'),
+      type: "об'єднання",
+      title: "Об'єднати: " + g.map(p => p.name).join(' + '),
+      description: `${n} ${plural(n, 'проєкт', 'проєкти', 'проєктів')} на одну тему${reason.length ? ' (' + reason.join(', ') + ')' : ''}. Один застосунок з модулями замість ${n} окремих: менше підтримки, більше користі щодня.`,
+      relatedProjectIds: g.map(p => p.id),
+      tags: uniq(g.flatMap(p => p.tags))
+    };
+  });
+}
+function improvementCandidates(live, known) {
+  const out = [];
+  const ordered = live.slice().sort(() => Math.random() - .5).sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
+  for (const p of ordered) {
+    const feats = uniq(p.tags.flatMap(t => FEATURE_LIB[t] || []));
+    for (const f of feats) {
+      const key = `imp:${p.id}:${f}`;
+      if (known.has(key) || p.features.some(x => x.text.toLowerCase() === f.toLowerCase())) continue;
+      out.push({
+        key, type: 'покращення', feature: f,
+        title: `${p.name}: ${f.charAt(0).toLowerCase() + f.slice(1)}`,
+        description: `Функція, якої бракує в «${p.name}». Покращити те, що вже є, швидше й корисніше, ніж починати новий застосунок.`,
+        relatedProjectIds: [p.id], tags: p.tags.slice()
+      });
+    }
+  }
+  // по одній функції на проєкт спочатку, щоб не було 5 покращень одного застосунку
+  const firstPerProject = [], rest = [], seen = new Set();
+  out.forEach(x => { const pid = x.relatedProjectIds[0]; if (seen.has(pid)) rest.push(x); else { seen.add(pid); firstPerProject.push(x); } });
+  return firstPerProject.concat(rest);
+}
+function gapCandidates(known) {
+  return goalCoverage().filter(g => g.count <= 1).sort((a, b) => a.count - b.count).flatMap(g =>
+    (GAP_LIB[g.name] || []).map(x => ({
+      key: 'gap:' + x.title, type: 'нова', title: x.title,
+      description: `${x.description} Ціль «${g.name}» зараз покриває ${g.count} ${plural(g.count, 'проєкт', 'проєкти', 'проєктів')}.`,
+      relatedProjectIds: [], tags: x.tags.slice()
+    }))
+  ).filter(x => !known.has(x.key));
+}
+function generate() {
+  const known = new Set([...db.dismissed, ...db.ideas.map(i => i.key).filter(Boolean)]);
+  const live = db.projects.filter(p => p.status !== 'закрито');
+  const merges = mergeClusters(live).filter(m => !known.has(m.key));
+  const imps = improvementCandidates(live, known);
+  const gaps = gapCandidates(known);
+  // пріоритет: об'єднання → покращення → нове
+  const out = [...merges.slice(0, 2), ...imps.slice(0, 2), ...gaps.slice(0, 1)];
+  const rest = [...merges.slice(2), ...imps.slice(2), ...gaps.slice(1)];
+  while (out.length < 5 && rest.length) out.push(rest.shift());
+  out.forEach(s => {
+    s.similarTo = s.type === 'нова' ? (findSimilar(s.tags, s.title + ' ' + s.description)?.id || null) : null;
+  });
+  db.suggestions = out;
+  save();
+  return out.length;
+}
+
+/* ============ Промпти ============ */
+function aiPromptText() {
+  const live = db.projects.filter(p => p.status !== 'закрито');
+  const rejected = db.ideas.filter(i => i.state === 'архів').slice(0, 15);
+  const lines = [
+    'Ти — мій продуктовий радник. Я сам роблю застосунки і схильний розпорошуватись. Ось мої проєкти:',
+    '',
+    ...live.map((p, n) => `${n + 1}. ${p.name}${p.description ? ' — ' + p.description : ''} [${p.status}${p.tags.length ? '; ' + p.tags.join(', ') : ''}]`),
+    '',
+    'Мої цілі: навчання, французька, трейдинг та інвестиції, бізнес, спорт.',
+    `Правило: одночасно в роботі не більше ${MAX_ACTIVE} проєктів. Нові застосунки — в останню чергу.`
+  ];
+  if (rejected.length) lines.push('', 'Ці ідеї я вже відкинув, не повторюй їх: ' + rejected.map(i => i.title).join('; ') + '.');
+  lines.push(
+    '',
+    'Запропонуй 5 справді корисних ідей:',
+    '- щонайменше 3 мають бути покращенням або об\'єднанням моїх існуючих проєктів;',
+    '- кожна має вирішувати реальну проблему, і я користуватимусь цим щодня або щотижня;',
+    '- не пропонуй того, що вже добре роблять безкоштовні застосунки;',
+    '- кожну можна зробити за 1–3 вечори.',
+    '',
+    'Відповідай ТІЛЬКИ JSON-масивом, без пояснень і без markdown:',
+    '[{"title":"...","description":"що робить і чому це мені потрібно","type":"покращення | об\'єднання | нова","relatedProjects":["точна назва мого проєкту"]}]'
+  );
+  return lines.join('\n');
+}
+function makeSpec(i) {
+  const rel = i.relatedProjectIds.map(getP).filter(Boolean);
+  const tags = i.tags.length ? i.tags : uniq(rel.flatMap(p => p.tags));
+  const goals = GOALS.filter(g => g.tags.some(t => tags.includes(t))).map(g => g.name.toLowerCase());
+  const u = i.scores?.usage || 0;
+  const usage = u >= 4 ? 'щодня' : u === 3 ? 'щотижня' : 'регулярно';
+  const feats = uniq([...(i.feature ? [i.feature] : []), ...tags.flatMap(t => FEATURE_LIB[t] || [])]).slice(0, 6);
+  const L = [];
+  if (i.type === 'покращення' && rel[0]) {
+    const p = rel[0];
+    L.push(`Додай у мій застосунок «${p.name}» нову функцію: ${i.feature || i.title}.`);
+    if (p.link) L.push(`Застосунок: ${p.link}`);
+    L.push('', 'МЕТА', i.description, '', 'ЩО ЗРОБИТИ',
+      `- ${i.feature || i.title}: окремий екран або кнопка там, де це логічно.`,
+      '- Не ламай існуючі функції й дані користувача (localStorage).',
+      '- Онови service worker (версію кешу), щоб зміни підтягнулись на телефоні.');
+  } else if (i.type === "об'єднання" && rel.length) {
+    L.push(`Об'єднай мої застосунки ${rel.map(p => '«' + p.name + '»').join(', ')} в один застосунок з модулями. Українська мова.`);
+    L.push('', 'МЕТА', i.description, '', 'ЩО ОБ\'ЄДНУЄМО');
+    rel.forEach(p => L.push(`- ${p.name}${p.description ? ': ' + p.description : ''}${p.link ? ' (' + p.link + ')' : ''}`));
+    L.push('Кожен стає модулем або вкладкою. Перенеси найкраще з кожного, дублікати прибери, спільні речі (профіль, прогрес, налаштування) зроби одним.',
+      '', 'ВКЛАДКИ', ...rel.slice(0, 4).map(p => `- ${p.name.replace(/\s*\(.*?\)\s*/g, ' ').trim()}`), '- Прогрес (спільний для всіх модулів)');
+  } else {
+    L.push(`Створи застосунок «${i.title}» українською мовою.`, '', 'МЕТА', i.description,
+      '', 'ВКЛАДКИ (3–5)', '- Головна: те, що я роблю щодня, за 1–2 дотики', '- Додати / запис', '- Історія та прогрес', '- Налаштування (тема, експорт/імпорт)');
+  }
+  L.push('', 'ДЛЯ КОГО', `Для мене особисто. Користуватимусь ${usage}.${goals.length ? ' Допомагає цілям: ' + goals.join(', ') + '.' : ''}`);
+  if (i.type !== 'покращення' && feats.length) L.push('', 'КЛЮЧОВІ ФУНКЦІЇ', ...feats.map(f => '- ' + f));
+  L.push('', 'ДАНІ', '- Без сервера, localStorage, експорт/імпорт JSON.',
+    '', 'ДИЗАЙН', '- Мінімалістичний, у стилі Apple: світла і темна тема, великі картки, плавні анімації, нижнє меню.',
+    '- Mobile-first, кнопки не менше 44px, PWA (manifest + service worker), працює офлайн.',
+    '', 'ДЕПЛОЙ', '- GitHub Pages через GitHub Actions (.github/workflows/pages.yml), дай мені посилання.',
+    '', 'ГОТОВО, КОЛИ', '- Головний сценарій працює з телефона за 3 дотики.', '- Дані зберігаються після перезавантаження.', '- Працює без інтернету.');
+  return L.join('\n');
+}
+
+/* ============ Компоненти ============ */
+function typePill(type) {
+  const m = TYPE_META[type] || TYPE_META['нова'];
+  return `<span class="pill c-${m.c}">${m.icon} ${esc(type)}</span>`;
+}
+function projectCard(p) {
+  const feats = p.features.length ? `<ul class="feats">${p.features.map((f, n) => `
+    <li class="${f.done ? 'done' : ''}">
+      <button class="check ${f.done ? 'on' : ''}" data-act="featToggle" data-id="${p.id}" data-i="${n}" aria-label="Позначити виконаним">${f.done ? '✓' : ''}</button>
+      <span>${esc(f.text)}</span>
+      <button class="x" data-act="featDel" data-id="${p.id}" data-i="${n}" aria-label="Видалити функцію">×</button>
+    </li>`).join('')}</ul>` : '';
+  const paused = p.status === 'на паузі' ? `<span class="muted small">${days(p.statusChangedAt)} дн.</span>` : '';
+  return `<article class="card">
+    <div class="card-top">
+      <button class="pill dot c-${STATUS_COLOR[p.status]}" data-act="statusMenu" data-id="${p.id}" aria-label="Змінити статус">${p.status}</button>${paused}
+      <button class="icon-btn end" data-act="editProject" data-id="${p.id}" aria-label="Редагувати">···</button>
+    </div>
+    <h3>${esc(p.name)}</h3>
+    ${p.description ? `<p class="desc">${esc(p.description)}</p>` : ''}
+    ${p.tags.length ? `<div class="tags">${p.tags.map(t => `<span class="tag">#${esc(t)}</span>`).join('')}</div>` : ''}
+    ${feats}
+    ${p.link ? `<a class="link" href="${esc(safeUrl(p.link))}" target="_blank" rel="noopener">↗ ${esc(p.link.replace(/^https?:\/\//, ''))}</a>` : ''}
+  </article>`;
+}
+function ideaCard(i, mode, rank) {
+  const rel = i.relatedProjectIds.map(getP).filter(Boolean);
+  const sim = i.similarTo ? getP(i.similarTo) : null;
+  const featTarget = sim || (i.type === 'покращення' ? rel[0] : null);
+  const id = esc(mode === 'sug' ? i.key : i.id);
+  const v = i.total != null ? verdictOf(i.total) : null;
+  const score = v ? `<div class="score c-${v.c}">${i.total}<small>/25</small></div>` : '';
+  let actions = '';
+  const featBtn = (act, primary) => featTarget ? `<button class="btn sm ${primary ? 'primary' : ''}" data-act="${act}" data-id="${id}">＋ Як функцію до «${esc(featTarget.name)}»</button>` : '';
+  if (mode === 'sug') {
+    actions = featBtn('sugFeature', true) +
+      `<button class="btn sm ${featTarget ? '' : 'primary'}" data-act="sugSave" data-id="${id}">Зберегти ідею</button>` +
+      `<button class="btn sm ghost" data-act="sugDismiss" data-id="${id}">Не треба</button>`;
+  } else if (mode === 'plan') {
+    actions = `<button class="btn sm primary" data-act="ideaTake" data-id="${id}">Взяти в роботу</button>` +
+      `<button class="btn sm" data-act="ideaSpec" data-id="${id}">ТЗ для Claude Code</button>`;
+  } else if (mode === 'archive') {
+    actions = `<button class="btn sm" data-act="ideaRestore" data-id="${id}">Відновити й переоцінити</button>`;
+  } else if (i.state === 'нова') {
+    actions = `<button class="btn sm primary" data-act="ideaEval" data-id="${id}">Оцінити</button>` + featBtn('ideaFeature') +
+      `<button class="btn sm ghost" data-act="ideaArchive" data-id="${id}">В архів</button>`;
+  } else {
+    actions = `<button class="btn sm" data-act="ideaEval" data-id="${id}">Переоцінити</button>` +
+      `<button class="btn sm" data-act="ideaSpec" data-id="${id}">ТЗ</button>` + featBtn('ideaFeature') +
+      `<button class="btn sm ghost" data-act="ideaArchive" data-id="${id}">В архів</button>`;
+  }
+  return `<article class="card">
+    <div class="card-top">${rank ? `<span class="rank">${rank}</span>` : ''}${typePill(i.type)}
+      ${v ? `<span class="pill c-${v.c}">${v.label}</span>` : (mode !== 'sug' && i.state === 'нова' ? '<span class="muted small">не оцінено</span>' : '')}
+      ${score}</div>
+    <h3>${esc(i.title)}</h3>
+    ${i.description ? `<p class="desc">${esc(i.description)}</p>` : ''}
+    ${rel.length ? `<div class="tags">${rel.map(p => `<span class="tag proj">${esc(p.name)}</span>`).join('')}</div>` : ''}
+    ${sim ? `<div class="warn-box">⚠️ <b>Схоже на: ${esc(sim.name)}</b>. Краще додати як функцію, а не робити новий проєкт.</div>` : ''}
+    <div class="actions">${actions}</div>
+  </article>`;
+}
+function remindersHtml() {
+  return pausedLong().map(p => `<div class="card" style="border:1px solid color-mix(in srgb,var(--orange) 40%,transparent)">
+    <div class="card-top"><span class="pill dot c-orange">на паузі ${days(p.statusChangedAt)} дн.</span></div>
+    <h3>«${esc(p.name)}» — продовжити чи закрити?</h3>
+    <div class="actions">
+      <button class="btn sm primary" data-act="pauseContinue" data-id="${p.id}">Продовжити</button>
+      <button class="btn sm danger" data-act="pauseClose" data-id="${p.id}">Закрити</button>
+      <button class="btn sm ghost" data-act="pauseLater" data-id="${p.id}">Нагадати пізніше</button>
+    </div></div>`).join('');
+}
+function emptyHtml(icon, text, btn) {
+  return `<div class="empty"><div class="big">${icon}</div><p>${text}</p>${btn || ''}</div>`;
+}
+
+/* ============ Вкладки ============ */
+function renderProjects() {
+  const counts = {};
+  db.projects.forEach(p => { counts[p.status] = (counts[p.status] || 0) + 1; });
+  let list = db.projects.slice();
+  list = ui.status === 'all' ? list.filter(p => p.status !== 'закрито') : list.filter(p => p.status === ui.status);
+  if (ui.tag) list = list.filter(p => p.tags.includes(ui.tag));
+  list.sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status]);
+  const allTags = uniq(db.projects.flatMap(p => p.tags)).sort((a, b) => a.localeCompare(b, 'uk'));
+  const active = activeProjects().length;
+  const ideasNew = db.ideas.filter(i => i.state === 'нова').length;
+  return `
+    ${remindersHtml()}
+    <div class="tiles">
+      <div class="tile ${active >= MAX_ACTIVE ? 'warn' : ''}"><b>${active}/${MAX_ACTIVE}</b><span>в роботі</span></div>
+      <div class="tile"><b>${db.projects.filter(p => p.status !== 'закрито').length}</b><span>усього проєктів</span></div>
+      <div class="tile"><b>${ideasNew}</b><span>ідей чекають оцінки</span></div>
+    </div>
+    <div class="chips" role="tablist">
+      <button class="chip ${ui.status === 'all' ? 'on' : ''}" data-act="filterStatus" data-v="all">Усі</button>
+      ${STATUSES.map(s => `<button class="chip ${ui.status === s ? 'on' : ''}" data-act="filterStatus" data-v="${s}">${s}<b>${counts[s] || 0}</b></button>`).join('')}
+    </div>
+    <div class="filters-row">
+      <select class="input" id="tagFilter" aria-label="Фільтр за тегом">
+        <option value="">Усі теги</option>
+        ${allTags.map(t => `<option value="${esc(t)}" ${ui.tag === t ? 'selected' : ''}>#${esc(t)}</option>`).join('')}
+      </select>
+    </div>
+    ${list.length ? list.map(projectCard).join('') : emptyHtml('🗂', 'Тут поки порожньо.', '<button class="btn primary" data-act="addProject">Додати проєкт</button>')}
+    <button class="fab" data-act="addProject" aria-label="Додати проєкт">+</button>`;
+}
+
+function renderIdeas() {
+  const by = st => db.ideas.filter(i => i.state === st);
+  const sortT = a => a.slice().sort((x, y) => (y.total || 0) - (x.total || 0));
+  const fresh = by('нова'), acc = sortT(by('прийнята')), def = sortT(by('відкладена'));
+  let html = `<div class="toolbar">
+      <button class="btn primary big wide" data-act="generate">✨ Згенерувати ідеї</button>
+      <button class="btn" data-act="aiPrompt">🤖 Промпт для ШІ</button>
+      <button class="btn" data-act="aiPaste">📥 Відповідь ШІ</button>
+      <button class="btn wide" data-act="addIdea">＋ Своя ідея</button>
+    </div>`;
+  if (db.suggestions.length) {
+    html += `<h2 class="sec">Пропозиції <small>${db.suggestions.length}</small></h2>
+      <p class="hint">Спочатку об'єднання, потім покращення, нове — в останню чергу.</p>
+      ${db.suggestions.map(s => ideaCard(s, 'sug')).join('')}`;
+  }
+  if (fresh.length) html += `<h2 class="sec">Чекають оцінки <small>${fresh.length}</small></h2>${fresh.map(i => ideaCard(i, 'idea')).join('')}`;
+  if (acc.length) html += `<h2 class="sec">Робити зараз <small>${acc.length}</small></h2>${acc.map(i => ideaCard(i, 'idea')).join('')}`;
+  if (def.length) html += `<h2 class="sec">Відкладені <small>${def.length}</small></h2>${def.map(i => ideaCard(i, 'idea')).join('')}`;
+  if (!db.suggestions.length && !fresh.length && !acc.length && !def.length) {
+    html += emptyHtml('💡', 'Натисни «Згенерувати ідеї» — застосунок проаналізує твої проєкти і запропонує тільки потрібне.');
+  }
+  return html;
+}
+
+function renderFilter() {
+  const queue = db.ideas.filter(i => i.state === 'нова');
+  let cur = ui.evalId ? getI(ui.evalId) : null;
+  if (!cur) cur = queue[0] || null;
+  let html = '';
+  if (cur) {
+    if (ui.draftFor !== cur.id) { ui.draft = {...(cur.scores || {})}; ui.draftFor = cur.id; }
+    const rel = cur.relatedProjectIds.map(getP).filter(Boolean);
+    const sim = cur.similarTo ? getP(cur.similarTo) : null;
+    html += `<article class="card">
+        <div class="card-top">${typePill(cur.type)}<span class="muted small end">${queue.length} в черзі</span></div>
+        <h3>${esc(cur.title)}</h3>
+        ${cur.description ? `<p class="desc">${esc(cur.description)}</p>` : ''}
+        ${rel.length ? `<div class="tags">${rel.map(p => `<span class="tag proj">${esc(p.name)}</span>`).join('')}</div>` : ''}
+        ${sim ? `<div class="warn-box">⚠️ <b>Схоже на: ${esc(sim.name)}</b>. Можливо, це функція, а не новий проєкт.</div>` : ''}
+      </article>
+      ${QUESTIONS.map((q, n) => `<section class="card">
+        <div class="q-title"><span class="q-n">${n + 1}</span><span>${q.q}</span></div>
+        <div class="scale">${[1, 2, 3, 4, 5].map(v => `<button class="${ui.draft[q.k] === v ? 'on' : ''}" data-act="score" data-k="${q.k}" data-v="${v}" aria-label="${v}">${v}</button>`).join('')}</div>
+        <div class="scale-labels"><span>${q.lo}</span><span>${q.hi}</span></div>
+      </section>`).join('')}
+      <p class="hint" style="text-align:center">20+ — робити зараз · 13–19 — відкласти · до 12 — відкинути (в архів)</p>
+      <section class="card total-card">
+        <div class="progress"><i id="evalBar" style="width:0"></i></div>
+        <div class="total-row">
+          <div><div class="total-num"><span id="evalTotal">0</span><small>/25</small></div><span class="pill" id="evalVerdict" style="margin-top:4px">—</span></div>
+          <button class="btn primary" id="saveScoreBtn" data-act="saveScore" data-id="${cur.id}" disabled>Зберегти оцінку</button>
+        </div>
+      </section>`;
+    const others = queue.filter(i => i.id !== cur.id);
+    if (others.length) {
+      html += `<h2 class="sec">Далі в черзі <small>${others.length}</small></h2><div class="card"><ul class="rows">${others.map(i => `
+        <li><button class="row-btn" data-act="ideaEval" data-id="${i.id}">${typePill(i.type)}<span class="grow name">${esc(i.title)}</span><span class="muted">›</span></button></li>`).join('')}</ul></div>`;
+    }
+  } else {
+    html += emptyHtml('🎯', 'Усі ідеї оцінені. Нові ідеї з\'являться після генерації або імпорту.', '<button class="btn primary" data-act="gotoTab" data-id="ideas">До ідей</button>');
+  }
+  const def = db.ideas.filter(i => i.state === 'відкладена');
+  const arch = db.ideas.filter(i => i.state === 'архів');
+  html += `<h2 class="sec">Відсіяне</h2>
+    <details class="card"><summary>Відкладені <span class="muted small" style="margin-left:auto;margin-right:8px">${def.length}</span></summary>
+      ${def.length ? `<ul class="rows" style="margin-top:8px">${def.map(i => `<li><button class="row-btn" data-act="ideaEval" data-id="${i.id}"><span class="grow name">${esc(i.title)}</span><span class="pill c-orange">${i.total}</span></button></li>`).join('')}</ul>` : '<p class="muted small">Порожньо</p>'}
+    </details>
+    <details class="card"><summary>Архів (відкинуті) <span class="muted small" style="margin-left:auto;margin-right:8px">${arch.length}</span></summary>
+      <p class="muted small">Відкинуті ідеї не видаляються і більше не пропонуються генератором.</p>
+      ${arch.map(i => ideaCard(i, 'archive')).join('') || '<p class="muted small">Порожньо</p>'}
+    </details>`;
+  return html;
+}
+
+function renderPlan() {
+  const active = activeProjects();
+  const byT = (a, b) => (b.total || 0) - (a.total || 0);
+  const top = db.ideas.filter(i => i.state === 'прийнята').sort(byT)
+    .concat(db.ideas.filter(i => i.state === 'відкладена').sort(byT)).slice(0, 3);
+  const taken = db.ideas.filter(i => i.state === 'взято');
+  let html = `<section class="card">
+      <div class="card-top"><b style="font-size:17px">В роботі</b><span class="pill end ${active.length >= MAX_ACTIVE ? 'c-orange' : 'c-blue'}">${active.length} / ${MAX_ACTIVE}</span></div>
+      <div class="progress" style="margin:12px 0 4px"><i style="width:${Math.min(100, active.length / MAX_ACTIVE * 100)}%;background:${active.length >= MAX_ACTIVE ? 'var(--orange)' : 'var(--accent)'}"></i></div>
+      ${active.length ? `<ul class="rows">${active.map(p => `<li><span class="grow name">${esc(p.name)}</span>
+          <button class="btn sm" data-act="setStatusTo" data-id="${p.id}" data-st="на паузі">Пауза</button>
+          <button class="btn sm" data-act="setStatusTo" data-id="${p.id}" data-st="готово">Готово</button></li>`).join('')}</ul>`
+        : '<p class="muted" style="margin:8px 0 0">Нічого не в роботі. Візьми ідею з топ-3 нижче.</p>'}
+    </section>
+    <h2 class="sec">На що витратити час цього місяця</h2>`;
+  if (top.length) {
+    html += top.map((i, n) => ideaCard(i, 'plan', n + 1)).join('');
+    if (top.some(i => i.state === 'відкладена')) html += '<p class="hint">Частина топу — з відкладених: ідей з балом 20+ поки менше трьох.</p>';
+  } else {
+    html += emptyHtml('🏁', 'Оціни ідеї у «Фільтрі» — три найкращі з\'являться тут.', '<button class="btn primary" data-act="gotoTab" data-id="filter">До фільтра</button>');
+  }
+  html += `<section class="card" style="background:color-mix(in srgb,var(--accent) 9%,var(--card))">
+      <b>Правило фокусу</b>
+      <p class="desc" style="margin-top:6px">Не більше ${MAX_ACTIVE} проєктів у роботі одночасно. Щоб почати новий — заверш або постав на паузу один з поточних.</p>
+    </section>`;
+  if (taken.length) {
+    html += `<h2 class="sec">Взято в роботу <small>${taken.length}</small></h2><div class="card"><ul class="rows">${taken.map(i => {
+      const p = i.projectId ? getP(i.projectId) : null;
+      return `<li><span class="grow"><span class="name">${esc(i.title)}</span>${p ? `<br><span class="muted small">→ ${esc(p.name)}</span>` : ''}</span>
+        <button class="btn sm" data-act="ideaSpec" data-id="${i.id}">ТЗ</button></li>`;
+    }).join('')}</ul></div>`;
+  }
+  return html;
+}
+
+function renderStats() {
+  const P = db.projects, I = db.ideas;
+  const statusRows = STATUSES.map(s => ({label: s, n: P.filter(p => p.status === s).length, c: STATUS_COLOR[s]}));
+  const maxS = Math.max(1, ...statusRows.map(r => r.n));
+  const tagCount = {};
+  P.forEach(p => p.tags.forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; }));
+  const tagRows = Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const maxT = Math.max(1, ...tagRows.map(r => r[1]));
+  const cov = goalCoverage();
+  const maxC = Math.max(1, ...cov.map(g => g.count));
+  const n = st => I.filter(i => i.state === st).length;
+  const bar = (label, val, max, color, extra = '') =>
+    `<div class="bar-row"><span>${label}${extra}</span><div class="bar"><i style="width:${val / max * 100}%;background:var(--${color})"></i></div><b>${val}</b></div>`;
+  return `
+    ${remindersHtml()}
+    <div class="tiles">
+      <div class="tile"><b>${n('прийнята') + n('взято')}</b><span>прийнято</span></div>
+      <div class="tile"><b>${n('відкладена')}</b><span>відкладено</span></div>
+      <div class="tile"><b>${n('архів')}</b><span>відкинуто</span></div>
+    </div>
+    <h2 class="sec">Проєкти за статусом <small>${P.length}</small></h2>
+    <section class="card">${statusRows.map(r => bar(r.label, r.n, maxS, r.c)).join('')}</section>
+    <h2 class="sec">Найчастіші теги</h2>
+    <section class="card">${tagRows.length ? tagRows.map(([t, c]) => bar('#' + esc(t), c, maxT, 'accent')).join('') : '<p class="muted">Тегів поки немає</p>'}</section>
+    <h2 class="sec">Покриття цілей</h2>
+    <p class="hint">Ціль з 0–1 проєктом — «дірка». Генератор пропонує ідеї саме туди.</p>
+    <section class="card">${cov.map(g => bar(g.name, g.count, maxC, g.count <= 1 ? 'orange' : 'green', g.count <= 1 ? ' <span class="gap-mark">дірка</span>' : '')).join('')}</section>
+    <h2 class="sec">Ідеї</h2>
+    <section class="card"><ul class="rows">
+      <li><span class="grow">Чекають оцінки</span><b>${n('нова')}</b></li>
+      <li><span class="grow">Робити зараз</span><b>${n('прийнята')}</b></li>
+      <li><span class="grow">Взято в роботу</span><b>${n('взято')}</b></li>
+      <li><span class="grow">Відкладено</span><b>${n('відкладена')}</b></li>
+      <li><span class="grow">Відкинуто (архів)</span><b>${n('архів')}</b></li>
+      <li><span class="grow">Відхилено пропозицій генератора</span><b>${db.dismissed.length}</b></li>
+    </ul></section>`;
+}
+
+function renderSearch(q) {
+  const s = q.toLowerCase();
+  const hit = (...xs) => xs.join(' ').toLowerCase().includes(s);
+  const ps = db.projects.filter(p => hit(p.name, p.description, p.tags.join(' '), p.features.map(f => f.text).join(' ')));
+  const is = db.ideas.filter(i => hit(i.title, i.description));
+  if (!ps.length && !is.length) return emptyHtml('🔍', `Нічого не знайдено за «${esc(q)}»`);
+  return (ps.length ? `<h2 class="sec">Проєкти <small>${ps.length}</small></h2>${ps.map(projectCard).join('')}` : '') +
+    (is.length ? `<h2 class="sec">Ідеї <small>${is.length}</small></h2>${is.map(i => ideaCard(i, i.state === 'архів' ? 'archive' : 'idea')).join('')}` : '');
+}
+
+function render(animate) {
+  const q = ui.q.trim();
+  $('#title').textContent = q ? 'Пошук' : TITLES[ui.tab];
+  const main = $('#main');
+  main.classList.remove('enter');
+  const views = {projects: renderProjects, ideas: renderIdeas, filter: renderFilter, plan: renderPlan, stats: renderStats};
+  main.innerHTML = q ? renderSearch(q) : views[ui.tab]();
+  if (animate) { void main.offsetWidth; main.classList.add('enter'); }
+  document.querySelectorAll('.nav button').forEach(b => {
+    const on = b.dataset.id === ui.tab && !q;
+    b.classList.toggle('on', on);
+    if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
+  const n = db.ideas.filter(i => i.state === 'нова').length;
+  const badge = $('#filterBadge');
+  badge.textContent = n;
+  badge.hidden = !n;
+  if (!q && ui.tab === 'filter') updateTotal();
+}
+
+/* ============ Оцінювання ============ */
+function updateTotal() {
+  const el = $('#evalTotal');
+  if (!el) return;
+  const vals = QUESTIONS.map(q => ui.draft[q.k]).filter(Boolean);
+  const total = vals.reduce((a, b) => a + b, 0);
+  const complete = vals.length === QUESTIONS.length;
+  el.textContent = total;
+  const verdictEl = $('#evalVerdict'), bar = $('#evalBar');
+  bar.style.width = (total / 25 * 100) + '%';
+  if (complete) {
+    const v = verdictOf(total);
+    verdictEl.className = 'pill c-' + v.c;
+    verdictEl.textContent = v.label;
+    bar.style.background = `var(--${v.c})`;
+  } else {
+    verdictEl.className = 'pill c-gray';
+    verdictEl.textContent = `${vals.length} з ${QUESTIONS.length}`;
+    bar.style.background = 'var(--accent)';
+  }
+  $('#saveScoreBtn').disabled = !complete;
+}
+
+/* ============ Ліміт «в роботі» ============ */
+let pendingSlot = null;
+function withSlot(exceptId, fn) {
+  const active = activeProjects().filter(p => p.id !== exceptId);
+  if (active.length < MAX_ACTIVE) { fn(); return; }
+  pendingSlot = {exceptId, fn};
+  dialog({
+    title: `Вже ${active.length} проєкти в роботі`,
+    html: `<p>Правило фокусу: не більше ${MAX_ACTIVE} одночасно. Щоб почати новий — постав один на паузу або заверши.</p>
+      <ul class="rows">${active.map(p => `<li><span class="grow name">${esc(p.name)}</span>
+        <button class="btn sm" data-act="slotSet" data-id="${p.id}" data-st="на паузі">Пауза</button>
+        <button class="btn sm" data-act="slotSet" data-id="${p.id}" data-st="готово">Готово</button></li>`).join('')}</ul>`,
+    buttons: [{label: 'Скасувати', cls: 'ghost', fn: () => { pendingSlot = null; }}]
+  });
+}
+function changeStatus(id, st) {
+  const p = getP(id);
+  if (!p || p.status === st) return;
+  const apply = () => { setStatus(id, st); render(); toast(`«${p.name}» → ${st}`); };
+  if (st === 'в роботі') withSlot(id, apply); else apply();
+}
+
+/* ============ Шторка, діалог, тост ============ */
+function openSheet(title, html) {
+  $('#sheetTitle').textContent = title;
+  $('#sheetBody').innerHTML = html;
+  $('#sheetBody').scrollTop = 0;
+  const w = $('#sheetWrap');
+  w.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('open')));
+}
+function closeSheet() {
+  const w = $('#sheetWrap');
+  w.classList.remove('open');
+  setTimeout(() => { if (!w.classList.contains('open')) w.hidden = true; }, 380);
+}
+let dlgFns = [];
+function dialog({title, html = '', buttons = []}) {
+  dlgFns = buttons.map(b => b.fn || null);
+  $('#dlgTitle').textContent = title;
+  $('#dlgBody').innerHTML = html;
+  $('#dlgBtns').innerHTML = buttons.map((b, n) => `<button class="btn block ${b.cls || ''}" data-act="dlg" data-i="${n}">${esc(b.label)}</button>`).join('');
+  const w = $('#dlgWrap');
+  w.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add('open')));
+}
+function closeDialog() {
+  const w = $('#dlgWrap');
+  w.classList.remove('open');
+  setTimeout(() => { if (!w.classList.contains('open')) w.hidden = true; }, 240);
+}
+function confirmDlg(title, text, okLabel, fn) {
+  dialog({title, html: `<p>${text}</p>`, buttons: [{label: okLabel, cls: 'primary', fn}, {label: 'Скасувати', cls: 'ghost'}]});
+}
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (_) { /* немає доступу до буфера */ }
+    ta.remove();
+    return ok;
+  }
+}
+function textSheet(title, text, note) {
+  ui.copyText = text;
+  openSheet(title, `${note ? `<p class="hint" style="margin:0 4px 12px">${note}</p>` : ''}
+    <textarea class="input mono" rows="14" readonly>${esc(text)}</textarea>
+    <div class="stack" style="margin-top:12px"><button class="btn primary block big" data-act="copyText">Скопіювати</button></div>`);
+}
+
+/* ============ Форми ============ */
+function tagPicker(selected) {
+  const all = uniq([...BASE_TAGS, ...db.projects.flatMap(p => p.tags), ...selected]);
+  return `<div class="tags" id="tagPick" style="margin-top:0">${all.map(t => `<button type="button" class="chip ${selected.includes(t) ? 'on' : ''}" data-act="toggleTag" data-v="${esc(t)}">#${esc(t)}</button>`).join('')}</div>
+    <div class="inline"><input class="input" id="newTag" placeholder="Свій тег" maxlength="24"><button type="button" class="btn" data-act="addCustomTag">Додати</button></div>`;
+}
+const pickedTags = form => [...form.querySelectorAll('#tagPick .chip.on')].map(b => b.dataset.v);
+
+function projectForm(p) {
+  const isNew = !p;
+  p = p || {name: '', description: '', status: 'ідея', tags: [], link: ''};
+  openSheet(isNew ? 'Новий проєкт' : 'Редагувати проєкт', `<form id="projForm" data-id="${isNew ? '' : p.id}" autocomplete="off">
+    <label class="field"><span>Назва</span><input class="input" name="name" required maxlength="80" value="${esc(p.name)}"></label>
+    <label class="field"><span>Коротко про що</span><textarea class="input" name="description" rows="2" maxlength="300">${esc(p.description)}</textarea></label>
+    <label class="field"><span>Статус</span><select class="input" name="status">${STATUSES.map(s => `<option ${s === p.status ? 'selected' : ''}>${s}</option>`).join('')}</select></label>
+    <div class="field"><span>Теги</span>${tagPicker(p.tags)}</div>
+    <label class="field"><span>Посилання</span><input class="input" name="link" inputmode="url" placeholder="https://….github.io/…" value="${esc(p.link)}"></label>
+    <div class="stack">
+      <button class="btn primary block big" type="submit">Зберегти</button>
+      ${isNew ? '' : `<button class="btn danger block" type="button" data-act="deleteProject" data-id="${p.id}">Видалити проєкт</button>`}
+    </div></form>`);
+}
+function submitProject(f) {
+  const fd = new FormData(f);
+  const id = f.dataset.id;
+  const data = {
+    name: String(fd.get('name')).trim(),
+    description: String(fd.get('description')).trim(),
+    status: String(fd.get('status')),
+    link: String(fd.get('link')).trim(),
+    tags: pickedTags(f)
+  };
+  if (!data.name) { toast('Вкажи назву'); return; }
+  const old = id ? getP(id) : null;
+  const commit = () => {
+    if (old) {
+      if (old.status !== data.status) old.statusChangedAt = now();
+      Object.assign(old, data);
+    } else {
+      db.projects.unshift({id: uid(), ...data, features: [], createdAt: now(), statusChangedAt: now()});
+    }
+    save(); closeSheet(); render();
+    toast(old ? 'Збережено' : 'Проєкт додано');
+  };
+  if (data.status === 'в роботі' && (!old || old.status !== 'в роботі')) withSlot(id || null, commit);
+  else commit();
+}
+
+function ideaForm() {
+  const opts = db.projects.filter(p => p.status !== 'закрито').map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  openSheet('Своя ідея', `<form id="ideaForm" autocomplete="off">
+    <label class="field"><span>Ідея</span><input class="input" name="title" required maxlength="120" placeholder="Що саме зробити"></label>
+    <label class="field"><span>Навіщо це мені</span><textarea class="input" name="description" rows="3" maxlength="500" placeholder="Яку проблему вирішує"></textarea></label>
+    <label class="field"><span>Тип</span><select class="input" name="type">${Object.keys(TYPE_META).map(t => `<option ${t === 'нова' ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+    <label class="field"><span>Пов'язаний проєкт</span><select class="input" name="related"><option value="">— немає —</option>${opts}</select></label>
+    <div class="field"><span>Теги</span>${tagPicker([])}</div>
+    <button class="btn primary block big" type="submit">Додати ідею</button></form>`);
+}
+function submitIdea(f) {
+  const fd = new FormData(f);
+  const title = String(fd.get('title')).trim();
+  if (!title) { toast('Опиши ідею'); return; }
+  const related = String(fd.get('related') || '');
+  const relP = related ? getP(related) : null;
+  let tags = pickedTags(f);
+  if (!tags.length && relP) tags = relP.tags.slice();
+  const idea = {
+    id: uid(), key: 'manual:' + title.toLowerCase(), title,
+    description: String(fd.get('description')).trim(), type: String(fd.get('type')),
+    relatedProjectIds: related ? [related] : [], tags, scores: null, total: null,
+    state: 'нова', source: 'вручну', createdAt: now(), similarTo: null
+  };
+  if (idea.type === 'покращення' && relP) idea.feature = title;
+  const sim = idea.type === 'нова' ? findSimilar(tags, title + ' ' + idea.description, idea.relatedProjectIds) : null;
+  const add = () => { db.ideas.unshift(idea); save(); closeSheet(); render(); toast('Ідею додано — оціни її у «Фільтрі»'); };
+  if (sim) {
+    idea.similarTo = sim.id;
+    dialog({
+      title: 'Схоже на: ' + sim.name,
+      html: '<p>Ця ідея перетинається з існуючим проєктом. Може, це функція для нього, а не новий застосунок?</p>',
+      buttons: [
+        {label: `Додати як функцію до «${sim.name}»`, cls: 'primary', fn: () => { addFeature(sim, title); closeSheet(); render(); toast(`Додано як функцію до «${sim.name}»`); }},
+        {label: 'Все одно зберегти як ідею', fn: add},
+        {label: 'Скасувати', cls: 'ghost'}
+      ]
+    });
+  } else add();
+}
+
+function settingsSheet() {
+  const th = db.settings.theme;
+  openSheet('Налаштування', `
+    <div class="field"><span>Тема</span><div class="seg">
+      ${[['auto', 'Авто'], ['light', 'Світла'], ['dark', 'Темна']].map(([v, l]) => `<button class="${th === v ? 'on' : ''}" data-act="theme" data-v="${v}">${l}</button>`).join('')}
+    </div></div>
+    <div class="field"><span>Резервна копія</span><div class="stack">
+      <button class="btn block" data-act="export">⬇︎ Експорт усіх даних (JSON)</button>
+      <button class="btn block" data-act="import">⬆︎ Імпорт з JSON</button>
+    </div></div>
+    <div class="field"><span>Інше</span><div class="stack">
+      <button class="btn block danger" data-act="reset">Скинути до стартового списку</button>
+    </div></div>
+    <p class="muted small" style="margin:0 4px">Дані зберігаються лише на цьому пристрої. Роби експорт час від часу.<br>
+    ${db.projects.length} ${plural(db.projects.length, 'проєкт', 'проєкти', 'проєктів')} · ${db.ideas.length} ${plural(db.ideas.length, 'ідея', 'ідеї', 'ідей')} · схема v${VERSION}</p>`);
+}
+
+function aiPasteSheet() {
+  openSheet('Відповідь ШІ', `<p class="hint" style="margin:0 4px 12px">Встав JSON-відповідь Claude на «Промпт для ШІ». Ідеї з'являться у списку «Чекають оцінки».</p>
+    <textarea class="input mono" id="aiJson" rows="12" placeholder='[{"title":"…","description":"…","type":"покращення","relatedProjects":["…"]}]'></textarea>
+    <div class="stack" style="margin-top:12px"><button class="btn primary block big" data-act="aiImport">Додати ідеї</button></div>`);
+}
+function normType(t) {
+  t = String(t || '').toLowerCase();
+  if (t.startsWith('покращ') || t.startsWith('improv')) return 'покращення';
+  if (t.startsWith('об') || t.startsWith('merge') || t.startsWith('combin')) return "об'єднання";
+  return 'нова';
+}
+function matchProject(name) {
+  const n = String(name || '').toLowerCase().trim();
+  if (!n) return null;
+  return db.projects.find(p => p.name.toLowerCase() === n) ||
+    (n.length >= 4 ? db.projects.find(p => { const pn = p.name.toLowerCase(); return pn.includes(n) || n.includes(pn); }) : null) || null;
+}
+function importAi(text) {
+  const start = text.indexOf('['), end = text.lastIndexOf(']');
+  if (start < 0 || end <= start) throw new Error('Не знайшов JSON-масиву [ … ] у тексті');
+  let arr;
+  try { arr = JSON.parse(text.slice(start, end + 1)); }
+  catch (e) { throw new Error('JSON з помилкою: ' + e.message); }
+  if (!Array.isArray(arr)) throw new Error('Очікувався масив ідей');
+  const titles = new Set(db.ideas.map(i => i.title.toLowerCase()));
+  let added = 0, skipped = 0;
+  arr.forEach(x => {
+    const title = String(x?.title || '').trim();
+    if (!title || titles.has(title.toLowerCase())) { skipped++; return; }
+    const rel = (Array.isArray(x.relatedProjects) ? x.relatedProjects : [x.relatedProjects]).map(matchProject).filter(Boolean);
+    const relIds = uniq(rel.map(p => p.id));
+    const type = normType(x.type);
+    const description = String(x.description || '').trim();
+    const tags = uniq(rel.flatMap(p => p.tags));
+    const idea = {
+      id: uid(), key: 'ai:' + title.toLowerCase(), title, description, type,
+      relatedProjectIds: relIds, tags, scores: null, total: null, state: 'нова', source: 'ШІ', createdAt: now(),
+      similarTo: type === 'нова' ? (findSimilar(tags, title + ' ' + description, relIds)?.id || null) : null
+    };
+    if (type === 'покращення' && relIds.length) idea.feature = title;
+    db.ideas.unshift(idea);
+    titles.add(title.toLowerCase());
+    added++;
+  });
+  save();
+  return {added, skipped};
+}
+
+/* ============ Дії з ідеями ============ */
+function takeIdea(i) {
+  const rel = i.relatedProjectIds.map(getP).filter(Boolean);
+  if (i.type === 'покращення' && rel[0]) {
+    const p = rel[0];
+    const go = () => {
+      addFeature(p, i.feature || i.title);
+      setStatus(p.id, 'в роботі');
+      i.state = 'взято'; i.projectId = p.id; save(); render();
+      toast(`Функцію додано, «${p.name}» в роботі`);
+    };
+    if (p.status === 'в роботі') go(); else withSlot(p.id, go);
+    return;
+  }
+  withSlot(null, () => {
+    const isMerge = i.type === "об'єднання" && rel.length;
+    const p = {
+      id: uid(),
+      name: isMerge ? rel.map(x => x.name.replace(/\s*\(.*?\)\s*/g, ' ').trim()).join(' + ') : i.title,
+      description: i.description + (isMerge ? `\nОб'єднує: ${rel.map(x => x.name).join(', ')}` : ''),
+      status: 'в роботі',
+      tags: i.tags.length ? i.tags.slice() : uniq(rel.flatMap(x => x.tags)),
+      link: '', features: [], createdAt: now(), statusChangedAt: now(),
+      mergedFrom: isMerge ? rel.map(x => x.id) : undefined
+    };
+    db.projects.unshift(p);
+    if (isMerge) rel.forEach(x => setStatus(x.id, 'закрито'));
+    i.state = 'взято'; i.projectId = p.id; save(); render();
+    toast(isMerge ? 'Новий проєкт в роботі, старі позначено «закрито»' : 'Проєкт створено і взято в роботу');
+  });
+}
+
+/* ============ Обробники ============ */
+const ACTIONS = {
+  tab(id) {
+    ui.tab = id; ui.q = ''; $('#q').value = ''; $('.search .clear').hidden = true;
+    if (id !== 'filter') { ui.evalId = null; }
+    db.settings.tab = id; save();
+    window.scrollTo({top: 0});
+    render(true);
+  },
+  gotoTab(id) { ACTIONS.tab(id); },
+  clearSearch() { ui.q = ''; $('#q').value = ''; $('.search .clear').hidden = true; render(true); },
+  closeSheet,
+  dlg(id, el) { const fn = dlgFns[+el.dataset.i]; closeDialog(); if (fn) fn(); },
+
+  settings: settingsSheet,
+  theme(id, el) {
+    db.settings.theme = el.dataset.v; save(); applyTheme();
+    el.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === el));
+  },
+  export() {
+    const blob = new Blob([JSON.stringify(db, null, 2)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `kontrol-idej-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast('Резервну копію збережено');
+  },
+  import() { $('#importFile').value = ''; $('#importFile').click(); },
+  reset() {
+    confirmDlg('Скинути все?', 'Усі проєкти та ідеї буде замінено стартовим списком. Спершу зроби експорт, якщо дані потрібні.', 'Скинути', () => {
+      const theme = db.settings.theme;
+      db = seedData(); db.settings.theme = theme; save(); closeSheet(); render(true); toast('Скинуто до стартового списку');
+    });
+  },
+
+  addProject() { projectForm(null); },
+  editProject(id) { projectForm(getP(id)); },
+  deleteProject(id) {
+    const p = getP(id);
+    confirmDlg('Видалити проєкт?', `«${esc(p.name)}» буде видалено. Якщо просто не працюєш над ним — краще статус «закрито».`, 'Видалити', () => {
+      db.projects = db.projects.filter(x => x.id !== id);
+      db.ideas.forEach(i => { i.relatedProjectIds = i.relatedProjectIds.filter(x => x !== id); if (i.similarTo === id) i.similarTo = null; });
+      save(); closeSheet(); render(); toast('Проєкт видалено');
+    });
+  },
+  statusMenu(id) {
+    const p = getP(id);
+    dialog({
+      title: p.name,
+      html: '<p>Новий статус</p>',
+      buttons: [...STATUSES.filter(s => s !== p.status).map(s => ({label: s, fn: () => changeStatus(id, s)})), {label: 'Скасувати', cls: 'ghost'}]
+    });
+  },
+  setStatusTo(id, el) { changeStatus(id, el.dataset.st); },
+  slotSet(id, el) {
+    setStatus(id, el.dataset.st);
+    closeDialog();
+    const ps = pendingSlot; pendingSlot = null;
+    render();
+    if (ps) setTimeout(() => withSlot(ps.exceptId, ps.fn), 260);
+  },
+  featToggle(id, el) { const f = getP(id).features[+el.dataset.i]; f.done = !f.done; save(); render(); },
+  featDel(id, el) { getP(id).features.splice(+el.dataset.i, 1); save(); render(); },
+  toggleTag(id, el) { el.classList.toggle('on'); },
+  addCustomTag(id, el) {
+    const inp = $('#newTag');
+    const t = inp.value.trim().toLowerCase().replace(/^#/, '');
+    if (!t) return;
+    const pick = $('#tagPick');
+    let chip = [...pick.querySelectorAll('.chip')].find(c => c.dataset.v === t);
+    if (!chip) {
+      pick.insertAdjacentHTML('beforeend', `<button type="button" class="chip on" data-act="toggleTag" data-v="${esc(t)}">#${esc(t)}</button>`);
+    } else chip.classList.add('on');
+    inp.value = '';
+  },
+  filterStatus(id, el) { ui.status = el.dataset.v; render(); },
+
+  generate() {
+    const n = generate();
+    render(true);
+    toast(n ? `${n} ${plural(n, 'пропозиція', 'пропозиції', 'пропозицій')}` : 'Нових ідей немає — оціни або відкинь наявні');
+  },
+  aiPrompt() { textSheet('Промпт для ШІ', aiPromptText(), 'Скопіюй і встав у Claude. Його відповідь (JSON) додай кнопкою «Відповідь ШІ».'); },
+  aiPaste: aiPasteSheet,
+  aiImport() {
+    try {
+      const {added, skipped} = importAi($('#aiJson').value);
+      closeSheet(); render(true);
+      toast(`Додано ${added}${skipped ? `, пропущено ${skipped} (дублікати)` : ''}. Оціни їх у «Фільтрі»`);
+    } catch (e) { toast(e.message); }
+  },
+  async copyText() { toast(await copy(ui.copyText) ? 'Скопійовано' : 'Виділи текст і скопіюй вручну'); },
+  addIdea: ideaForm,
+
+  sugSave(key) {
+    const s = db.suggestions.find(x => x.key === key);
+    if (!s) return;
+    db.ideas.unshift({...s, id: uid(), scores: null, total: null, state: 'нова', source: 'генератор', createdAt: now()});
+    db.suggestions = db.suggestions.filter(x => x.key !== key);
+    save(); render(); toast('Збережено — оціни у «Фільтрі»');
+  },
+  sugFeature(key) {
+    const s = db.suggestions.find(x => x.key === key);
+    if (!s) return;
+    const p = getP(s.similarTo) || getP(s.relatedProjectIds[0]);
+    addFeature(p, s.feature || s.title);
+    db.dismissed.push(key);
+    db.suggestions = db.suggestions.filter(x => x.key !== key);
+    save(); render(); toast(`Додано як функцію до «${p.name}»`);
+  },
+  sugDismiss(key) {
+    db.dismissed.push(key);
+    db.suggestions = db.suggestions.filter(x => x.key !== key);
+    save(); render();
+  },
+  ideaEval(id) {
+    const i = getI(id);
+    ui.evalId = id; ui.draft = {...(i.scores || {})}; ui.draftFor = id;
+    ui.tab = 'filter'; ui.q = ''; $('#q').value = '';
+    window.scrollTo({top: 0}); render(true);
+  },
+  score(id, el) {
+    ui.draft[el.dataset.k] = +el.dataset.v;
+    el.parentElement.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === el));
+    updateTotal();
+  },
+  saveScore(id) {
+    const i = getI(id);
+    const total = QUESTIONS.reduce((a, q) => a + (ui.draft[q.k] || 0), 0);
+    const v = verdictOf(total);
+    Object.assign(i, {scores: {...ui.draft}, total, verdict: v.label, state: v.state, scoredAt: now()});
+    ui.evalId = null; ui.draft = {}; ui.draftFor = null;
+    save(); window.scrollTo({top: 0}); render(true);
+    toast(`${v.label} · ${total}/25${v.state === 'архів' ? ' — ідея в архіві' : ''}`);
+  },
+  ideaArchive(id) { getI(id).state = 'архів'; save(); render(); toast('Ідею перенесено в архів'); },
+  ideaRestore(id) {
+    Object.assign(getI(id), {state: 'нова', scores: null, total: null, verdict: null});
+    save(); render(); toast('Ідея повернулась у чергу на оцінку');
+  },
+  ideaFeature(id) {
+    const i = getI(id);
+    const p = getP(i.similarTo) || getP(i.relatedProjectIds[0]);
+    addFeature(p, i.feature || i.title);
+    i.state = 'взято'; i.projectId = p.id;
+    save(); render(); toast(`Додано як функцію до «${p.name}»`);
+  },
+  ideaTake(id) { takeIdea(getI(id)); },
+  ideaSpec(id) { const i = getI(id); textSheet('ТЗ для Claude Code', makeSpec(i), 'Скопіюй і встав у Claude Code як завдання.'); },
+
+  pauseContinue(id) { changeStatus(id, 'в роботі'); },
+  pauseClose(id) { changeStatus(id, 'закрито'); },
+  pauseLater(id) { getP(id).statusChangedAt = now(); save(); render(); toast(`Нагадаю через ${PAUSE_DAYS} днів`); }
+};
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const fn = ACTIONS[el.dataset.act];
+  if (!fn) return;
+  if (el.tagName === 'BUTTON' && el.type !== 'submit') e.preventDefault();
+  fn(el.dataset.id, el, e);
+});
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  if (e.target.id === 'projForm') submitProject(e.target);
+  else if (e.target.id === 'ideaForm') submitIdea(e.target);
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'tagFilter') { ui.tag = e.target.value; render(); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (!$('#dlgWrap').hidden) closeDialog();
+    else if (!$('#sheetWrap').hidden) closeSheet();
+  }
+  if (e.key === 'Enter' && e.target.id === 'newTag') { e.preventDefault(); ACTIONS.addCustomTag(); }
+});
+let searchTimer;
+$('#q').addEventListener('input', e => {
+  $('.search .clear').hidden = !e.target.value;
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { ui.q = e.target.value; render(); }, 120);
+});
+$('#importFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try { data = JSON.parse(reader.result); } catch (err) { toast('Файл не є коректним JSON'); return; }
+    if (!data || !Array.isArray(data.projects) || !Array.isArray(data.ideas)) { toast('Це не резервна копія «Контролю ідей»'); return; }
+    confirmDlg('Замінити всі дані?', `У файлі: ${data.projects.length} ${plural(data.projects.length, 'проєкт', 'проєкти', 'проєктів')}, ${data.ideas.length} ${plural(data.ideas.length, 'ідея', 'ідеї', 'ідей')}. Поточні дані буде замінено.`, 'Імпортувати', () => {
+      db = migrate(data); save(); applyTheme(); closeSheet(); render(true); toast('Дані імпортовано');
+    });
+  };
+  reader.readAsText(file);
+});
+
+function applyTheme() { document.documentElement.dataset.theme = db.settings.theme || 'auto'; }
+
+applyTheme();
+render(true);
+
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
